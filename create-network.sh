@@ -89,8 +89,8 @@ sleep 2
 
 # 외부에서 ALB(80/443 포트)는 구글에서 관리하여 방화벽 규칙은 필요없습니다.
 
-# LB에서 헬스체크를 위한 방화벽 규칙 생성: 별도 연결이 없어도 구글에서 자동 연결 함.
-gcloud compute firewall-rules create allow-gcp-health-check \
+LB에서 헬스체크를 위한 방화벽 규칙 생성: 별도 연결이 없어도 구글에서 자동 연결 함.
+gcloud compute firewall-rules create st5-allow-gcp-health-check \
     --network=st5-vpc \
     --action=ALLOW \
     --direction=INGRESS \
