@@ -1,0 +1,43 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: st5-cluster
+  namespace: config-control # 실제 환경의 네임스페이스로 변경하세요
+  labels: # 클러스터 자체에 대한 라벨 (GCP 리소스 관리용)
+    username: st5
+    classname: msp06
+spec:
+  location: asia-east2
+  networkRef:
+    name: st5-vpc
+  subnetworkRef:
+    name: st5-public-subnet
+  
+  # VPC-native 클러스터 활성화 (ip-alias)
+  ipAllocationPolicy:
+    useIpAliases: true
+
+  # Workload Identity 설정
+  workloadIdentityConfig:
+    workloadPool: "${PROJECT_ID}.svc.id.goog"
+
+  # 만약 노드 풀을 더 세밀하게 제어하려면 아래와 같이 nodePool 설정을 사용합니다.
+  nodePools:
+    - name: st5-pool
+      initialNodeCount: 1
+      autoscaling:
+        minNodeCount: 1
+        maxNodeCount: 2
+      nodeConfig:
+        machineType: e2-medium
+        diskSizeGb: 20
+        # 1. 인스턴스 보안 태그 추가 (방화벽 규칙 적용용)
+        # 이 태그를 사용하여 VPC 방화벽에서 80, 443, 22번 포트 등을 허용할 수 있습니다.
+        tags:
+          - web-server
+          - ssh-server
+          - was-server
+        # 2. 쿠버네티스 노드 라벨 추가 (K8s 내부 스케줄링용)
+        labels:
+          username: st5
+          classname: msp06
